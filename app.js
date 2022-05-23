@@ -1,9 +1,164 @@
-//Adding PIXI app
-const Application = PIXI.Application;
+import { HealthBar } from "./health-bar.js";
 
-const speed = 4;
+class Game {
 
-const app = new Application({
+
+    constructor(){
+
+        this.speed = 4
+
+        this.app = new PIXI.Application({
+                width: 1600,
+                height: 800,
+                transparent: false,
+                antialias: true
+            }
+        );
+
+        this.app.renderer.backgroundColor = 0x4DA7CC;
+        this.app.renderer.view.style.position = 'absolute';
+
+        //Appending PIXI to the dom
+        document.body.appendChild(this.app.view)
+
+        // create player
+        this.createPlayer()
+
+        // create enemy
+        this.createEnemy()
+        
+        // create letter
+        this.createLetter()
+
+        // create background
+        // this.createBackground()
+
+        // create health bar
+        this.healthBar = new HealthBar(this.app)
+
+        // start game loop
+        this.app.ticker.add(() => this.gameLoop())
+    }
+
+    // createBackground() {
+    //     //Clouds in background
+    //      //1: create a texture of the clouds image
+    //     this.background = PIXI.Texture.from('./images/cloud copy.png');
+
+    //     //2: create another type of sprite by instantiating the pixi tile in sprite class
+    //     this.cloudsSprite = new PIXI.TilingSprite(
+    //     //adding the width and height of the screen
+    //     this.background, 
+    //     this.app.screen.width,
+    //     this.app.screen.height
+    //     );
+
+    //     //Tile Scale Set Method
+    //     this.cloudsSprite.tileScale.set(0.5, 0.5);
+
+    //     //Animating clouds
+    //     this.app.ticker.add(function() {
+    //         //Change value of tile X
+    //         this.cloudsSprite.tilePosition.x += 1;
+    //     });
+
+    //     //add it to the stage
+    //     this.app.stage.addChild(this.cloudsSprite);   
+    // }
+
+
+    createPlayer() {
+
+        //PLAYER
+        //Creating the player
+        this.player = PIXI.Sprite.from('./images/GameSuperheldPixelArt-SUPERMAN.png');
+        this.player.width = 230;
+        this.player.height = 130;
+        this.player.position.set(100, 300);
+        // this.player = new PIXI.Graphics();
+
+        // this.player.beginFill(0xF1BF90);
+        // this.player.lineStyle(4, 0xFFEA00, 1);
+        // this.player.drawRect(200, 400, 100, 100);
+        // this.player.endFill();
+
+        this.app.stage.addChild(this.player)
+
+        //Keyboard Events on Player
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp')
+                this.player.y -= 15;
+            if (e.key === 'ArrowDown')
+                this.player.y += 15;
+        });
+    }
+
+
+
+    createEnemy() {
+
+        //ENEMIES
+        // Random Spawn Function
+        //For loop
+        for (let i = 0; i < 3; i++) {
+
+        this.enemy = PIXI.Sprite.from('./images/GameSuperheldPixelArt-CLOUD-Enemy.png');
+
+        this.enemy.width = 230;
+        this.enemy.height = 130;
+        this.enemy.position.set(Math.random() * 1600, Math.random() * 600);
+
+        this.app.stage.addChild(this.enemy);
+
+        
+        }
+    }
+
+    createLetter() {
+
+        //LETTER
+        // Random Spawn Function
+        //For loop
+        for (let i = 0; i < 1; i++) {
+
+        this.letter = PIXI.Sprite.from('./images/letterA.png');
+
+        this.letter.width = 100;
+        this.letter.height = 100;
+        this.letter.position.set(Math.random() * 1600, Math.random() * 600);
+
+        this.app.stage.addChild(this.letter);
+
+        }
+
+    }
+
+    gameLoop(delta) {
+
+        if (this.rectsIntersect(this.player, this.enemy)) {
+            //add healthbar 
+            this.healthBar.updateHealth(-0.5);
+            //kill the enemy
+            this.speed = 0;
+        }
+    }
+
+    // detect collisions
+    rectsIntersect(a, b) {
+        const aBox = a.getBounds();
+        const bBox = b.getBounds();
+
+        return aBox.x + aBox.width > bBox.x &&
+            aBox.x < bBox.x + bBox.width &&
+            aBox.y + aBox.height > bBox.y &&
+            aBox.y < bBox.y + bBox.height;
+    }
+
+}
+
+new Game()
+
+const app = new PIXI.Application({
     width: 1600,
     height: 800,
     transparent: false,
@@ -11,91 +166,32 @@ const app = new Application({
 }
 );
 
-app.renderer.backgroundColor = 0x87CEEB
-app.renderer.view.style.position = 'absolute';
+    //Clouds in background
+     //1: create a texture of the clouds image
+     const cloudsTexture = PIXI.Texture.from('./images/cloud-copy.png');
 
-//Appending PIXI to the dom
-document.body.appendChild(app.view);
+     //2: create another type of sprite by instantiating the pixi tile in sprite class
+     const cloudsSprite = new PIXI.TilingSprite(
+     //adding the width and height of the screen
+         cloudsTexture, 
+         app.screen.width,
+         app.screen.height
+     );
+     
+     //Tile Scale Set Method
+     cloudsSprite.tileScale.set(0.5, 0.5);
+     
+     //Animating clouds
+     app.ticker.add(function() {
+         //Change value of tile X
+         cloudsSprite.tilePosition.x +=1;
+     });
+     
+     //add it to the stage
+     app.stage.addChild(cloudsSprite);
 
-//PLAYER
-//Creating the player
-const Graphics = PIXI.Graphics;
 
-const player = new Graphics();
 
-player.beginFill(0xF1BF90);
-player.lineStyle(4, 0xFFEA00, 1);
-player.drawRect(200, 400, 100, 100);
-player.endFill();
-
-app.stage.addChild(player);
-
-//Keyboard Events on Player
-document.addEventListener('keydown', function (e) {
-    if(e.key === 'ArrowUp')
-        player.y -= 15;
-    if(e.key === 'ArrowDown')
-        player.y += 15;
-});
-
-//ENEMIES
-//Random Spawn Function
-const enemy = new Graphics();
-
-enemy.beginFill(0xF15757);
-enemy.lineStyle(4, 0x7A2C2C, 1)
-enemy.drawRect(1200, 400, 100, 100);
-enemy.endFill();
-
-app.stage.addChild(enemy);
-
-app.ticker.add(gameLoop);
-
-//Making the enemy move on the x-axis
-function gameLoop(delta) {
-    enemy.x -= speed;
-
-    if (rectsIntersect(player, enemy)) {
-        //add healthbar -
-        health -= 10;
-        healthBar.updateHealth(health);
-        //kill the enemy
-        speed = 0;
-    }
-}
-
-//Detect collision on the player and enemy
-function rectsIntersect (a, b){
-    const aBox = a.getBounds();
-    const bBox = b.getBounds();
-
-    return aBox.x + aBox.width > bBox.x &&
-            aBox.x < bBox.x + bBox.width &&
-            aBox.y + aBox.height > bBox.y &&
-            aBox.y < bBox.y + bBox.height;
-}
-
-//HEALTHBAR
-const canvas = document.getElementById("canvas");
-const context = canvas.getContext("2d");
-const width = canvas.width = 320;
-const height = canvas.height = 50;
-
-let health = 100;
-const healthBarWidth = 200;
-const healthBarHeight = 30;
-const x = width / 2 - healthBarWidth / 2;
-const y = height / 2 - healthBarHeight / 2;
-
-const healthBar = new HealthBar(x, y, healthBarWidth, healthBarHeight, health, "green");
-
-const frame = function() {
-  context.clearRect(0, 0, width, height);
-  healthBar.show(context);
-  requestAnimationFrame(frame);
-}
-
-frame();
 
 
 

@@ -1,28 +1,19 @@
-class HealthBar {
-    constructor(x, y, w, h, maxHealth, color) {
-      this.x = x;
-      this.y = y;
-      this.w = w;
-      this.h = h;
-      this.maxHealth = maxHealth;
-      this.maxWidth = w;
-      this.health = maxHealth;
-      this.color = color;
-    }
-  
-    show(context) {
-      context.lineWidth = 4;
-      context.strokeStyle = "#333";
-      context.fillStyle = this.color;
-      context.fillRect(this.x, this.y, this.w, this.h);
-      context.strokeRect(this.x, this.y, this.maxWidth, this.h);
-    }
-  
-    updateHealth(val) {
-      if (val >= 0) {
-        this.health = val;
-        this.w = (this.health / this.maxHealth) * this.maxWidth;
-      }
-    }
+export class HealthBar {
+  constructor(app) {
+      this.bar = new PIXI.Graphics();
+      this.health = 100
+      app.stage.addChild(this.bar);
+      this.updateHealth()
   }
 
+  updateHealth(val) {
+      if (this.health + val >= 0 && this.health + val <= 100) {
+          this.health += val;
+      }
+      this.bar.clear()
+      this.bar.beginFill(0x23DE2C);
+      this.bar.lineStyle(4, 0x000000, 1)
+      this.bar.drawRect(30, 10, this.health, 40);
+      this.bar.endFill();
+  }
+}
